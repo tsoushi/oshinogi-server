@@ -1,11 +1,13 @@
 import express, { Request, Response, NextFunction} from 'express';
 import userRoutes  from "./routes/users";
+import politicianRoutes  from "./routes/politicians";
 
 
 const app = express();
 
 
 app.use("/users", userRoutes);
+app.use("/politicians", politicianRoutes);
 app.use(express.json());
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {//エラーハンドリングミドルウェア

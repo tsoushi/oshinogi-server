@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { getAllUser, registerUser } from "../controllers/users";
-import express from 'express';
+import { getAllUsers, registerUser } from "../controllers/users";
+
 
 
 const router = Router();
 
-router.use(express.json())
 
-router.get("/", getAllUser);
+
+router.get("/", getAllUsers);
 
 router.post("/register", registerUser);
 
