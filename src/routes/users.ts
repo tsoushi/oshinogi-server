@@ -1,12 +1,15 @@
 import { Router } from "express";
-import { getAllUser } from "../controllers/users";
+import { getAllUser, registerUser } from "../controllers/users";
+import express from 'express';
 
 
 const router = Router();
 
+router.use(express.json())
+
 router.get("/", getAllUser);
 
-//router.post("/register", registerUser);
+router.post("/register", registerUser);
 
 //router.post("/login", loginUser);
 
