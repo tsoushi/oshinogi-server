@@ -16,7 +16,7 @@ const makeUserResponse = (user: User) => {
 
 // getAllUser
 
-export const getAllUser: RequestHandler = async (req, res, next) => {
+export const getAllUsers: RequestHandler = async (req, res, next) => {
     const users = await prisma.user.findMany()
     const userResponses = users.map(makeUserResponse)
     res.status(200).json({ users: userResponses })
