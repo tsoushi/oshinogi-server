@@ -24,7 +24,7 @@ export const getAllPoliticians: RequestHandler = async (req, res, next) => {
     res.status(200).json({ politicians: politicianResponses })
 }
 
-
+//registerPolitician
 export const registerPolitician: RequestHandler = async (req, res, next) => {
     // 必須フィールドである name を取得
     const { name } = req.body;
@@ -39,16 +39,14 @@ export const registerPolitician: RequestHandler = async (req, res, next) => {
       try {
         const politician = await prisma.politician.create({
             data: {
-                name,
-                description,
-                imageURL
+                name: name,
+                description: description,
+                imageURL: imageURL,
             }
         });
 
-        // 成功時のレスポンス
         res.status(201).json({ politician: makePoliticianResponse(politician) });
     } catch (error) {
-        // エラーレスポンス
         console.error('Error creating politician:', error);
         res.status(500).json({ error: 'An error occurred while creating the politician' });
     }
