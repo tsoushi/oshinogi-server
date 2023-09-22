@@ -30,7 +30,7 @@ export const getAllPoliticians: RequestHandler = async (req, res, next) => {
 //registerPolitician
 type RegisterArgs = {
     name: string,
-    desciption: string,
+    description: string,
     imageURL: string
 }
 
@@ -38,7 +38,7 @@ const isRegisterArgs = (value: unknown): value is RegisterArgs => {
     const v = value as RegisterArgs;
     return (
         typeof v?.name === 'string' &&
-        typeof v?.desciption === 'string' &&
+        typeof v?.description === 'string' &&
         typeof v?.imageURL === 'string' 
     );
 };
@@ -58,7 +58,7 @@ export const registerPolitician: RequestHandler = async (req, res, next) => {
         const politician = await prisma.politician.create({
             data: {
                 name: req.body.name,
-                description: req.body.desciption,
+                description: req.body.description,
                 imageURL: req.body.imageURL,
                 level: 0
             }
