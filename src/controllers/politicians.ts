@@ -23,3 +23,33 @@ export const getAllPoliticians: RequestHandler = async (req, res, next) => {
     const politicianResponses = politicians.map(makePoliticianResponse)
     res.status(200).json({ politicians: politicianResponses })
 }
+
+
+export const registerPolitician: RequestHandler = async (req, res, next) => {
+    // 必須フィールドである name を取得
+    const { name } = req.body;
+    // name フィールドの存在を確認
+    if (!name) {
+        res.status(400).json({ error: 'name is a required field' });
+        return;
+    }
+    const { description = '', imageURL = '' } = req.body;
+    
+      // データをデータベースに追加
+      try {
+        const politician = await prisma.politician.create({
+            data: {
+                name,
+                description,
+                imageURL
+            }
+        });
+
+        // 成功時のレスポンス
+        res.status(201).json({ politician: makePoliticianResponse(politician) });
+    } catch (error) {
+        // エラーレスポンス
+        console.error('Error creating politician:', error);
+        res.status(500).json({ error: 'An error occurred while creating the politician' });
+    }
+};
