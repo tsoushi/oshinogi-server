@@ -24,24 +24,43 @@ export const getAllPoliticians: RequestHandler = async (req, res, next) => {
     res.status(200).json({ politicians: politicianResponses })
 }
 
+
+
+
 //registerPolitician
+type RegisterArgs = {
+    name: string,
+    desciption: string,
+    imageURL: string
+}
+
+const isRegisterArgs = (value: unknown): value is RegisterArgs => {
+    const v = value as RegisterArgs;
+    return (
+        typeof v?.name === 'string' &&
+        typeof v?.desciption === 'string' &&
+        typeof v?.imageURL === 'string' 
+    );
+};
+
+
 export const registerPolitician: RequestHandler = async (req, res, next) => {
-    // 必須フィールドである name を取得
-    const { name } = req.body;
-    // name フィールドの存在を確認
-    if (!name) {
-        res.status(400).json({ error: 'name is a required field' });
-        return;
+    if (!isRegisterArgs(req.body)) {
+        res.json({
+            error: 'invalid argment'
+        })
+        return
     }
-    const { description = '', imageURL = '' } = req.body;
+    
     
       // データをデータベースに追加
       try {
         const politician = await prisma.politician.create({
             data: {
-                name: name,
-                description: description,
-                imageURL: imageURL,
+                name: req.body.name,
+                description: req.body.desciption,
+                imageURL: req.body.imageURL,
+                level: 0
             }
         });
 
