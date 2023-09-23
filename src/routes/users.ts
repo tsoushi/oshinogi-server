@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { getAllUsers, registerUser } from "../controllers/users";
+import { getAllUsers, registerUser, getUser } from "../controllers/users";
+import { authenticateUser } from "../middlewares/auth";
 
 
 
 const router = Router();
 
 
+router.get("/", authenticateUser, getUser)
 
-router.get("/", getAllUsers);
+router.get("/all", getAllUsers);
 
 router.post("/register", registerUser);
-
-//router.post("/login", loginUser);
 
 export default router

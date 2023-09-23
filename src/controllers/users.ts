@@ -1,6 +1,7 @@
 import express, { RequestHandler} from 'express';
 import { PrismaClient, User } from '@prisma/client'
 import bcrypt from 'bcrypt'
+import { UserAuthenticatedRequest } from 'types/request';
 
 const prisma = new PrismaClient();
 
@@ -52,4 +53,14 @@ export const registerUser: RequestHandler = async (req, res, next) => {
     })
 
     res.json({ user: makeUserResponse(user) })
+}
+
+export const getUser: RequestHandler = async (req, res, next) => {
+    const ureq = req as UserAuthenticatedRequest
+
+    if (typeof ureq.user === 'undefined') {
+        throw Error('not authenticated')
+    }
+
+    res.json({ user: makeUserResponse(ureq.user)})
 }
