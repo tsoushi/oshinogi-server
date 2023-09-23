@@ -1,5 +1,5 @@
 import express, { RequestHandler} from 'express';
-import { PrismaClient, Politician } from "@prisma/client";
+import { PrismaClient, Politician, Board } from "@prisma/client";
 
 
 const prisma = new PrismaClient();
@@ -60,9 +60,18 @@ export const registerPolitician: RequestHandler = async (req, res, next) => {
                 name: req.body.name,
                 description: req.body.description,
                 imageURL: req.body.imageURL,
-                level: 0
+                level: 1
             }
         });
+
+        // PoliticianのIDを取得
+        const politicianId = politician.id;
+
+        const board = await prisma.board.create({
+            data: {
+                politicianId: politicianId
+            }
+        })
 
         res.status(201).json({ politician: makePoliticianResponse(politician) });
     } catch (error) {
@@ -70,3 +79,37 @@ export const registerPolitician: RequestHandler = async (req, res, next) => {
         res.status(500).json({ error: 'An error occurred while creating the politician' });
     }
 };
+
+
+//特定の議員の取得
+export const getPolitician: RequestHandler =async (req, res, next) => {
+    const id: number = parseInt(req.params.id, 10);//paramsはstringらしいです。
+    if(isNaN(id)){
+        res.json({
+            error: 'paramserror'
+        })
+        return
+    }
+    else{
+        try {
+            const politician = await prisma.politician.findUnique({
+                where: {
+                    id: id,
+                  },
+            })
+            if(!politician){
+                res.status(404).json({
+                    error: 'Politician not found'
+                })
+            }
+            else{
+                res.status(200).json(politician);
+            }
+        } catch (error) {
+            console.error('Error fetching politician:', error);
+            res.status(500).json({
+                error: 'Internal server error'
+            });
+        }
+    }
+}
