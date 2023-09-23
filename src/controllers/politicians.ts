@@ -1,5 +1,5 @@
 import express, { RequestHandler} from 'express';
-import { PrismaClient, Politician } from "@prisma/client";
+import { PrismaClient, Politician, Board } from "@prisma/client";
 
 
 const prisma = new PrismaClient();
@@ -60,9 +60,18 @@ export const registerPolitician: RequestHandler = async (req, res, next) => {
                 name: req.body.name,
                 description: req.body.description,
                 imageURL: req.body.imageURL,
-                level: 0
+                level: 1
             }
         });
+
+        // PoliticianのIDを取得
+        const politicianId = politician.id;
+
+        const board = await prisma.board.create({
+            data: {
+                politicianId: politicianId
+            }
+        })
 
         res.status(201).json({ politician: makePoliticianResponse(politician) });
     } catch (error) {
