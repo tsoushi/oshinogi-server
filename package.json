@@ -4,7 +4,8 @@
   "description": "",
   "main": "src/main.js",
   "scripts": {
-    "start": "tsc && node dist/main.js"
+    "start": "tsc && node dist/main.js",
+    "format": "prettier --write src/**/*.ts"
   },
   "author": "",
   "license": "ISC",
