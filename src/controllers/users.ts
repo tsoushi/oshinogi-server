@@ -71,7 +71,9 @@ export const selectPolitician: RequestHandler = async (req, res, next) => {
     }
     const { favoritePoliticianId } = req.body;
 
-    if (typeof favoritePoliticianId !== "number") {
+    const parseId: number = parseInt(favoritePoliticianId, 10)
+
+    if (typeof parseId !== "number") {
         res.status(400).json({
             error: "Bad request: favoritePoliticianIdが不正です。",
         });
@@ -84,7 +86,7 @@ export const selectPolitician: RequestHandler = async (req, res, next) => {
                     id: ureq.user.id,
                 },
                 data: {
-                    favoritePoliticianId: favoritePoliticianId
+                    favoritePoliticianId: parseId
                 }
             })
             res.status(200).json({updateUser: makeUserResponse(updateUser)});
