@@ -89,7 +89,7 @@ export const selectPolitician: RequestHandler = async (req, res, next) => {
                     favoritePoliticianId: parseId
                 }
             })
-            res.status(200).json({updateUser: makeUserResponse(updateUser)});
+            res.status(200).json({user: makeUserResponse(updateUser)});
         } catch (error) {
             res.status(500).json({ error: "ユーザーの更新中にエラーが発生しました" });
         }
