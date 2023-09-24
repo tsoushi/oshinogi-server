@@ -5,7 +5,8 @@
   "main": "src/main.js",
   "scripts": {
     "start": "tsc && node dist/main.js",
-    "format": "prettier --write src/**/*.ts"
+    "format": "prettier --write src/**/*.ts",
+    "fmt": "npm run format"
   },
   "author": "",
   "license": "ISC",
