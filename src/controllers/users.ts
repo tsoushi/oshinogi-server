@@ -71,7 +71,7 @@ export const selectPolitician: RequestHandler = async (req, res, next) => {
     }
     const { favoritePoliticianId } = req.body;
 
-    const parseId: number = parseInt(favoritePoliticianId, 10)
+    const parseId: number = parseInt(favoritePoliticianId, 10)//req.bodyもstringだった
 
     if (typeof parseId !== "number") {
         res.status(400).json({
