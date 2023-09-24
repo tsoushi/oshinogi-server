@@ -1,6 +1,7 @@
 node_modules
 dist
 .env
+.vscode
 
 prisma/*.db
 prisma/*.db-journal
