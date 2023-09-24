@@ -60,3 +60,35 @@ export const getUser: RequestHandler = async (req, res, next) => {
 
     res.json({ user: makeUserResponse(ureq.user) });
 };
+
+
+//推しの選択
+export const selectPolitician: RequestHandler = async (req, res, next) => {
+    const ureq = req as UserAuthenticatedRequest;
+
+    if (typeof ureq.user === "undefined") {
+        throw Error("not authenticated");
+    }
+    const favoritePoliticianId: number = parseInt(req.params.id, 10);
+    if (isNaN(favoritePoliticianId)) {
+        res.json({
+            error: "paramserror",
+        });
+        return;
+    }
+    else{
+        try {
+            const updateUser = await prisma.user.update({//ログイン中のユーザーを見つけ出して、推しを登録している
+                where: {
+                    id: ureq.user.id,
+                },
+                data: {
+                    favoritePoliticianId: favoritePoliticianId
+                }
+            })
+            res.status(200).json({updateUser: makeUserResponse(updateUser)});
+        } catch (error) {
+            res.status(500).json({ error: "ユーザーの更新中にエラーが発生しました" });
+        }
+    }
+}
