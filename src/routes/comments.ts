@@ -6,6 +6,6 @@ const router = Router();
 
 router.get("/", getComment);
 
-router.post("/:id", authenticateUser , postComment);
+router.post("/board/:id", authenticateUser , postComment);
 
 export default router;

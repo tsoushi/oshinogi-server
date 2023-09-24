@@ -16,6 +16,7 @@ const makeCommentResponse = (comment: Comment) => {
     }
 }
 
+//getComment
 export const getComment: RequestHandler = async(req, res, next) => {
     const id: number = parseInt(req.query.politicianId as string, 10);
     if(isNaN(id)){
@@ -52,3 +53,53 @@ export const getComment: RequestHandler = async(req, res, next) => {
         
     }
 }
+
+//postComment
+type RegisterArgs = {
+    content: string;
+}
+
+const isRegisterArgs = (value: unknown): value is RegisterArgs => {
+    const v = value as RegisterArgs;
+    return typeof v?.content === "string" 
+};
+
+export const postComment: RequestHandler = async (req, res, next) => {
+    const ureq = req as UserAuthenticatedRequest;
+
+    if (typeof ureq.user === "undefined") {
+        throw Error("not authenticated");
+    }
+
+    if (!isRegisterArgs(req.body)) {
+        res.json({
+            error: "invalid argment",
+        });
+        return;
+    }
+
+    const id: number = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+        res.status(400).json({
+            error: "params error",
+        });
+        return;
+    }
+    else{
+        try {
+            const comment = await prisma.comment.create({
+                data: {
+                    userId: ureq.user.id,
+                    boardId: id,
+                    content: req.body.content,
+                    plusMinus: 0
+                }
+            });
+            res.status(201).json({comment: makeCommentResponse(comment)});
+        } catch (error) {
+            console.log("Cannot create comment")
+            res.status(500).json({error: "コメントの作成ができませんでした"})
+        }
+    }
+}
+
