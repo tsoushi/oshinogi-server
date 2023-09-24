@@ -69,10 +69,11 @@ export const selectPolitician: RequestHandler = async (req, res, next) => {
     if (typeof ureq.user === "undefined") {
         throw Error("not authenticated");
     }
-    const favoritePoliticianId: number = parseInt(req.params.id, 10);
-    if (isNaN(favoritePoliticianId)) {
-        res.json({
-            error: "paramserror",
+    const { favoritePoliticianId } = req.body;
+
+    if (typeof favoritePoliticianId !== "number") {
+        res.status(400).json({
+            error: "Bad request: favoritePoliticianIdが不正です。",
         });
         return;
     }

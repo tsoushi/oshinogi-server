@@ -10,6 +10,6 @@ router.get("/all", getAllUsers);
 
 router.post("/register", registerUser);
 
-router.put("/:id", authenticateUser, selectPolitician);
+router.put("/", authenticateUser, selectPolitician);
 
 export default router;
