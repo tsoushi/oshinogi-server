@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
-import { PrismaClient, Comment, Board } from "@prisma/client";
+import { PrismaClient, Comment, Politician } from "@prisma/client";
 import { UserAuthenticatedRequest } from "types/request";
+import { plusLevel } from "../caluculates/caluculate";
 
 const prisma = new PrismaClient();
 
@@ -15,6 +16,18 @@ const makeCommentResponse = (comment: Comment) => {
         updatedAt: comment.updatedAt
     }
 }
+
+const makePoliticianResponse = (politician: Politician) => {
+    return {
+        id: politician.id,
+        name: politician.name,
+        description: politician.description,
+        imageURL: politician.imageURL,
+        level: politician.level,
+        createdAt: politician.createdAt,
+        updatedAt: politician.updatedAt,
+    };
+};
 
 //getComment
 export const getComment: RequestHandler = async(req, res, next) => {
@@ -131,9 +144,11 @@ export const plusComment: RequestHandler = async (req, res, next) => {
                 },
             },
         });
+        const updatePolitician: Politician | undefined = await plusLevel(updateComment.boardId);
 
         res.status(200).json({
             comment: makeCommentResponse(updateComment),
+            politician: updatePolitician
         });
     } catch (error) {
         console.log("Cannot plus");
