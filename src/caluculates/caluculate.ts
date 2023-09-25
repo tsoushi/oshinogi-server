@@ -91,17 +91,3 @@ export const minusLevel = async (boardId: number) => {
         }
     }
 };
-  
-
-
-
-
-        
-      
-
-
-
-      
-
-    
-    
