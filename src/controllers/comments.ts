@@ -103,6 +103,7 @@ export const postComment: RequestHandler = async (req, res, next) => {
     }
 }
 
+//plusComment
 export const plusComment: RequestHandler = async (req, res, next) => {
     const ureq = req as UserAuthenticatedRequest;
 
@@ -141,5 +142,46 @@ export const plusComment: RequestHandler = async (req, res, next) => {
         });
     }
 };
+
+//minusComment
+export const minusComment: RequestHandler = async (req, res, next) => {
+    const ureq = req as UserAuthenticatedRequest;
+
+    if (typeof ureq.user === "undefined") {
+        throw Error("not authenticated");
+    }
+
+    const id: number = parseInt(req.body.commentId);
+
+    if (isNaN(id)) {
+        res.status(400).json({
+            error: "parse error",
+        });
+        return;
+    }
+
+    try {
+        const updateComment = await prisma.comment.update({
+            where: {
+                id: id,
+            },
+            data: {
+                plusMinus: {
+                    decrement: 1, // plusMinusフィールドを-1する
+                },
+            },
+        });
+
+        res.status(200).json({
+            comment: makeCommentResponse(updateComment),
+        });
+    } catch (error) {
+        console.log("Cannot minus");
+        res.status(500).json({
+            error: "Internal Server Error",
+        });
+    }
+};
+
 
 
