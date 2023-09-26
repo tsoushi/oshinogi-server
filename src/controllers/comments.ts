@@ -19,7 +19,7 @@ const makeCommentResponse = (comment: Comment) => {
 
 //getComment
 export const getComment: RequestHandler = async(req, res, next) => {
-    const id: number = parseInt(req.query.politicianId as string, 10);
+    const id: number = parseInt(req.query.politician_id as string, 10);
     if(isNaN(id)){
         res.json({
             error: "query error",
