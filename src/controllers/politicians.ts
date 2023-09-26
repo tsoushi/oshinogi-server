@@ -91,6 +91,9 @@ export const getPolitician: RequestHandler = async (req, res, next) => {
                 where: {
                     id: id,
                 },
+                include: {
+                    board: true, // board情報を含める
+                },
             });
             if (!politician) {
                 res.status(404).json({
