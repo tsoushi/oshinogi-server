@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { PrismaClient, Comment, Politician } from "@prisma/client";
 import { UserAuthenticatedRequest } from "types/request";
-import { minusLevel, plusLevel } from "../caluculates/caluculate";
+import { setPlusMinus } from "../caluculates/caluculate";
 
 const prisma = new PrismaClient();
 
@@ -58,6 +58,7 @@ export const getComment: RequestHandler = async(req, res, next) => {
 //postComment
 type RegisterArgs = {
     content: string;
+    plusMinus: number;
 }
 
 const isRegisterArgs = (value: unknown): value is RegisterArgs => {
@@ -93,102 +94,20 @@ export const postComment: RequestHandler = async (req, res, next) => {
                     userId: ureq.user.id,
                     boardId: id,
                     content: req.body.content,
-                    plusMinus: 0
+                    plusMinus: req.body.plusMinus
                 }
             });
-            res.status(201).json({comment: makeCommentResponse(comment)});
+            const updatePolitician: Politician | undefined = await setPlusMinus(comment.boardId,comment.plusMinus);
+            res.status(201).json({
+                comment: makeCommentResponse(comment),
+                politician: updatePolitician
+            });
         } catch (error) {
             console.log("Cannot create comment")
             res.status(500).json({error: "コメントの作成ができませんでした"})
         }
     }
 }
-
-//plusComment
-export const plusComment: RequestHandler = async (req, res, next) => {
-    const ureq = req as UserAuthenticatedRequest;
-
-    if (typeof ureq.user === "undefined") {
-        throw Error("not authenticated");
-    }
-
-    const id: number = parseInt(req.body.commentId);
-
-    if (isNaN(id)) {
-        res.status(400).json({
-            error: "parse error",
-        });
-        return;
-    }
-
-    try {
-        const updateComment = await prisma.comment.update({
-            where: {
-                id: id,
-            },
-            data: {
-                plusMinus: {
-                    increment: 1, // plusMinusフィールドを+1する
-                },
-            },
-        });
-        const updatePolitician: Politician | undefined = await plusLevel(updateComment.boardId);
-
-        res.status(200).json({
-            comment: makeCommentResponse(updateComment),
-            politician: updatePolitician
-        });
-    } catch (error) {
-        console.log("Cannot plus");
-        res.status(500).json({
-            error: "Internal Server Error",
-        });
-    }
-};
-
-//minusComment
-export const minusComment: RequestHandler = async (req, res, next) => {
-    const ureq = req as UserAuthenticatedRequest;
-
-    if (typeof ureq.user === "undefined") {
-        throw Error("not authenticated");
-    }
-
-    const id: number = parseInt(req.body.commentId);
-
-    if (isNaN(id)) {
-        res.status(400).json({
-            error: "parse error",
-        });
-        return;
-    }
-
-    try {
-        const updateComment = await prisma.comment.update({
-            where: {
-                id: id,
-            },
-            data: {
-                plusMinus: {
-                    decrement: 1, // plusMinusフィールドを-1する
-                },
-            },
-        });
-        
-        const updatePolitician: Politician | undefined = await minusLevel(updateComment.boardId);
-        res.status(200).json({
-            comment: makeCommentResponse(updateComment),
-            politician: updatePolitician
-        });
-    } catch (error) {
-        console.log("Cannot minus");
-        res.status(500).json({
-            error: "Internal Server Error",
-        });
-    }
-};
-
-
 
 
 
