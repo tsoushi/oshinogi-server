@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import userRoutes from "./routes/users";
 import politicianRoutes from "./routes/politicians";
 import auth from "./routes/auth";
+import commentRoutes from "./routes/comments";
 
 const app = express();
 app.use(express.json());
@@ -9,6 +10,7 @@ app.use(express.json());
 app.use("/auth", auth);
 app.use("/users", userRoutes);
 app.use("/politicians", politicianRoutes);
+app.use("/comments", commentRoutes);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     //エラーハンドリングミドルウェア
