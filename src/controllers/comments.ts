@@ -58,12 +58,20 @@ export const getComment: RequestHandler = async(req, res, next) => {
 //postComment
 type RegisterArgs = {
     content: string;
-    plusMinus: number;
+    plusMinus: -1 | 0 | 1;
 }
 
 const isRegisterArgs = (value: unknown): value is RegisterArgs => {
     const v = value as RegisterArgs;
-    return typeof v?.content === "string" 
+    return (
+        typeof v?.content === "string" &&
+        typeof v?.plusMinus === "number" &&
+        (
+            v.plusMinus === -1 ||
+            v.plusMinus === 0 ||
+            v.plusMinus === 1
+        )
+    )
 };
 
 export const postComment: RequestHandler = async (req, res, next) => {
@@ -80,32 +88,61 @@ export const postComment: RequestHandler = async (req, res, next) => {
         return;
     }
 
-    const id: number = parseInt(req.params.id, 10);
-    if (isNaN(id)) {
+    const boardId: number = parseInt(req.params.id, 10);
+    if (isNaN(boardId)) {
         res.status(400).json({
             error: "params error",
         });
         return;
     }
-    else{
-        try {
-            const comment = await prisma.comment.create({
-                data: {
-                    userId: ureq.user.id,
-                    boardId: id,
-                    content: req.body.content,
-                    plusMinus: req.body.plusMinus
+
+    if (req.body.plusMinus != 0) {
+        // 評価付きコメントの投稿制限
+        const oneDayAgoDate = new Date()
+        oneDayAgoDate.setDate(oneDayAgoDate.getDate() - 1)
+
+        const resentComments = await prisma.comment.findMany({
+            take: 3,
+            where: {
+                boardId: boardId,
+                userId: ureq.user.id,
+                plusMinus: {
+                    not: 0
+                },
+                createdAt: {
+                    gte: oneDayAgoDate
                 }
-            });
-            const updatePolitician: Politician | undefined = await setPlusMinus(comment.boardId,comment.plusMinus);
-            res.status(201).json({
-                comment: makeCommentResponse(comment),
-                politician: updatePolitician
-            });
-        } catch (error) {
-            console.log("Cannot create comment")
-            res.status(500).json({error: "コメントの作成ができませんでした"})
+            },
+            orderBy: {
+                createdAt: "desc"
+            }
+        })
+
+        if (resentComments.length == 3) {
+            res.json({
+                error: 'The daily limit for rated comments is 3'
+            })
+            return
         }
+    }
+
+    try {
+        const comment = await prisma.comment.create({
+            data: {
+                userId: ureq.user.id,
+                boardId: boardId,
+                content: req.body.content,
+                plusMinus: req.body.plusMinus
+            }
+        });
+        const updatePolitician: Politician | undefined = await setPlusMinus(comment.boardId,comment.plusMinus);
+        res.status(201).json({
+            comment: makeCommentResponse(comment),
+            politician: updatePolitician
+        });
+    } catch (error) {
+        console.log("Cannot create comment")
+        res.status(500).json({error: "コメントの作成ができませんでした"})
     }
 }
 
