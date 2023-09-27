@@ -100,7 +100,7 @@ export const getPolitician: RequestHandler = async (req, res, next) => {
                     error: "Politician not found",
                 });
             } else {
-                res.status(200).json(politician);
+                res.status(200).json({ politician });
             }
         } catch (error) {
             console.error("Error fetching politician:", error);
